@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.analog.adis16470.frc.ADIS16470_IMU;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -12,6 +13,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -32,6 +34,9 @@ public class DriveSubsystem extends SubsystemBase {
   // The left-side drive encoder
   private final CANEncoder m_leftEncoder;
   private final CANEncoder m_rightEncoder;
+
+  // The gyro 
+  public static final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
   private double slewSpeed = 4;  // in units/s
   private double slewTurn = 4;
@@ -75,6 +80,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_drive.setSafetyEnabled(true);
     }
 
+
+    public void periodic(){
+      SmartDashboard.putNumber("Angle",getHeading());
+    }
   /**
    * Drives the robot using arcade controls.
    *
@@ -89,6 +98,14 @@ public class DriveSubsystem extends SubsystemBase {
   public void resetEncoders() {
     m_leftEncoder.setPosition(0);
     m_rightEncoder.setPosition(0);
+  }
+
+  public double getHeading() {
+    return Math.IEEEremainder(m_gyro.getAngle(), 360)*(DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  public void zeroHeading() {
+    m_gyro.reset();
   }
 
   /**

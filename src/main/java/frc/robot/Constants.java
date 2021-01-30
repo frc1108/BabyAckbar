@@ -29,6 +29,8 @@ public final class Constants {
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
+
+    public static final Boolean kGyroReversed = true;
   }
 
   public static final class HatchConstants {
