@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import frc.robot.pantherlib.SlewLimiter1108;
+
 public class DriveSubsystem extends SubsystemBase {
   // Constructors for Drive subsystem motors 
   CANSparkMax leftMotor1 = new CANSparkMax(DriveConstants.kLeftMotor1Port, MotorType.kBrushless);
@@ -40,8 +42,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private double slewSpeed = 4;  // in units/s
   private double slewTurn = 4;
-  private final SlewRateLimiter m_speedSlew = new SlewRateLimiter(slewSpeed);
-  private final SlewRateLimiter m_turnSlew = new SlewRateLimiter(slewTurn);
+  private final SlewLimiter1108 m_speedSlew = new SlewLimiter1108(slewSpeed);
+  private final SlewLimiter1108 m_turnSlew = new SlewLimiter1108(slewTurn);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
