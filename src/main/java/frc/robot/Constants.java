@@ -32,7 +32,10 @@ public final class Constants {
 
     public static final Boolean kGyroReversed = true;
   }
-
+  public static final class IntakeConstants {
+    public static final int kFrontIntakePort = 10;
+    public static final int kBackIntakePort = 11;
+  }
   public static final class HatchConstants {
     public static final int kHatchSolenoidModule = 0;
     public static final int[] kHatchSolenoidPorts = new int[] {0, 1};
