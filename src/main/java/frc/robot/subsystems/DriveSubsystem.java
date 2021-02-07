@@ -40,10 +40,12 @@ public class DriveSubsystem extends SubsystemBase {
   // The gyro 
   public static final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
-  private double slewSpeed = 4;  // in units/s
-  private double slewTurn = 4;
-  private final SlewLimiter1108 m_speedSlew = new SlewLimiter1108(slewSpeed);
-  private final SlewLimiter1108 m_turnSlew = new SlewLimiter1108(slewTurn);
+  private double slewSpeedA = 5;  // in units/s
+  private double slewSpeedD = 20;
+  private double slewTurnA = 5;
+  private double slewTurnD = 20;
+  private final SlewLimiter1108 m_speedSlew = new SlewLimiter1108(slewSpeedA,slewSpeedD);
+  private final SlewLimiter1108 m_turnSlew = new SlewLimiter1108(slewTurnA, slewTurnD);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -93,7 +95,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    m_drive.arcadeDrive(m_speedSlew.calculate(-fwd), m_turnSlew.calculate(rot));
+    m_drive.arcadeDrive(m_speedSlew.calculate(fwd), 0.8*m_turnSlew.calculate(rot));
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
