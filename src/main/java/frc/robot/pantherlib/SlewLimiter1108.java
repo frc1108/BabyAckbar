@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj.Timer;
  * edu.wpi.first.wpilibj.trajectory.TrapezoidProfile} instead.
  */
 public class SlewLimiter1108 {
-  private final double m_rateLimit;
+  private final double m_rateLimitA;
+  private final double m_rateLimitD;
   private double m_prevVal;
   private double m_prevTime;
 
@@ -25,8 +26,9 @@ public class SlewLimiter1108 {
    * @param rateLimit The rate-of-change limit, in units per second.
    * @param initialValue The initial value of the input.
    */
-  public SlewLimiter1108(double rateLimit, double initialValue) {
-    m_rateLimit = rateLimit;
+  public SlewLimiter1108(double rateLimitA, double rateLimitD, double initialValue) {
+    m_rateLimitA = rateLimitA;
+    m_rateLimitD = rateLimitD;
     m_prevVal = initialValue;
     m_prevTime = Timer.getFPGATimestamp();
   }
@@ -36,8 +38,8 @@ public class SlewLimiter1108 {
    *
    * @param rateLimit The rate-of-change limit, in units per second.
    */
-  public SlewLimiter1108(double rateLimit) {
-    this(rateLimit, 0);
+  public SlewLimiter1108(double rateLimitA, double rateLimitD) {
+    this(rateLimitA, rateLimitD, 0);
   }
 
   /**
@@ -52,9 +54,10 @@ public class SlewLimiter1108 {
     double inputChange = input - m_prevVal;
     if (input - m_prevVal < 0) {
       m_prevVal +=
-        MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
+        MathUtil.clamp(input - m_prevVal, -m_rateLimitA * elapsedTime, m_rateLimitA * elapsedTime);
     } else {
-       m_prevVal = input;
+       m_prevVal +=
+       MathUtil.clamp(input - m_prevVal, -m_rateLimitD * elapsedTime, m_rateLimitD * elapsedTime);
     } 
     m_prevTime = currentTime;
     return m_prevVal;
