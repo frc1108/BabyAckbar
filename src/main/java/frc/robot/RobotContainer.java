@@ -8,15 +8,13 @@ import static edu.wpi.first.wpilibj.XboxController.Button;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.ComplexAutoCommand;
+import frc.robot.commands.auto.ExampleTrajectory;
+import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -32,26 +30,9 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
-  // The autonomous routines
 
-  // A simple auto routine that drives forward a specified distance, and then stops.
-  private final Command m_simpleAuto =
-      new FunctionalCommand(
-          // Reset encoders on command start
-          m_robotDrive::resetEncoders,
-          // Drive forward while the command is executing
-          () -> m_robotDrive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
-          // Stop driving at the end of the command
-          interrupt -> m_robotDrive.arcadeDrive(0, 0),
-          // End the command when the robot's driven distance exceeds the desired value
-          () -> m_robotDrive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches,
-          // Require the drive subsystem
-          m_robotDrive);
-
-  // A complex auto routine that drives forward, drops a hatch, and then drives backward.
-  private final Command m_complexAuto = new ComplexAutoCommand(m_robotDrive);
+  private final Trajectories m_path = new Trajectories(m_robotDrive);
 
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -77,13 +58,6 @@ public class RobotContainer {
                     m_driverController.getY(GenericHID.Hand.kLeft),
                     m_driverController.getX(GenericHID.Hand.kRight)),
             m_robotDrive));
-
-    // Add commands to the autonomous command chooser
-    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
-    m_chooser.addOption("Complex Auto", m_complexAuto);
-
-    // Put the chooser on the dashboard
-    Shuffleboard.getTab("Autonomous").add(m_chooser);
   }
 
   /**
@@ -98,9 +72,13 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kBumperRight.value)
         .whenPressed(() -> m_robotDrive.setMaxOutput(triggerSpeed))
         .whenReleased(() -> m_robotDrive.setMaxOutput(defaultSpeed));
+
     new JoystickButton(m_driverController, Button.kBumperLeft.value)
         .whenPressed(() -> m_intake.start())
         .whenReleased(() -> m_intake.stop());
+
+    new JoystickButton(m_driverController, Button.kX.value)
+        .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
   }
 
   /**
@@ -109,6 +87,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_chooser.getSelected();
+    return new ExampleTrajectory(m_path,m_robotDrive);
+  }
+
+  public void reset(){
+    m_robotDrive.reset();
   }
 }

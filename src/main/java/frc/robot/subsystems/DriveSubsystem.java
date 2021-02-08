@@ -10,9 +10,14 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.SlewRateLimiter;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,6 +38,11 @@ public class DriveSubsystem extends SubsystemBase {
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
+  private final PIDController leftPID = new PIDController(DriveConstants.kPDriveVel, 0, 0);
+  private final PIDController rightPID = new PIDController(DriveConstants.kPDriveVel, 0, 0);
+  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(DriveConstants.ksVolts,DriveConstants.kvVoltSecondsPerMeter,DriveConstants.kaVoltSecondsSquaredPerMeter);
+  private final DifferentialDriveOdometry m_odometry;
+
   // The left-side drive encoder
   private final CANEncoder m_leftEncoder;
   private final CANEncoder m_rightEncoder;
@@ -49,9 +59,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    m_leftEncoder = leftMotor1.getEncoder();
-    m_rightEncoder = rightMotor1.getEncoder();
-
     // Stops drive motors
     stop();
     
@@ -72,6 +79,13 @@ public class DriveSubsystem extends SubsystemBase {
     leftMotor2.setSmartCurrentLimit(40, 60);
     rightMotor1.setSmartCurrentLimit(40, 60);
     rightMotor2.setSmartCurrentLimit(40, 60);
+
+    m_leftEncoder = leftMotor1.getEncoder();
+    m_rightEncoder = rightMotor1.getEncoder();
+    m_rightEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistanceConversionFactor);
+    m_rightEncoder.setVelocityConversionFactor(DriveConstants.kEncoderVelocityConversionFactor);
+    m_leftEncoder.setPositionConversionFactor(DriveConstants.kEncoderDistanceConversionFactor);
+    m_leftEncoder.setVelocityConversionFactor(DriveConstants.kEncoderVelocityConversionFactor);
   
     // Burn settings into Spark MAX flash
     leftMotor1.burnFlash();
@@ -82,12 +96,55 @@ public class DriveSubsystem extends SubsystemBase {
     // Set drive deadband and safety 
     m_drive.setDeadband(0.05);
     m_drive.setSafetyEnabled(true);
+
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
     }
 
 
     public void periodic(){
+      m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getPosition(), -m_rightEncoder.getPosition());
       SmartDashboard.putNumber("Angle",getHeading());
+      SmartDashboard.putNumber("Left Dist", m_leftEncoder.getPosition());
+      SmartDashboard.putNumber("Right Dist", -m_rightEncoder.getPosition());
     }
+
+    public Pose2d getPose() {
+      return m_odometry.getPoseMeters();
+  }
+
+  
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    zeroHeading();
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
+  }
+
+  
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(),-m_rightEncoder.getVelocity());
+} 
+
+public void tankDriveVolts(double leftVolts, double rightVolts) {
+    m_leftMotors.setVoltage(leftVolts);
+    m_rightMotors.setVoltage(-rightVolts);
+    m_drive.feed();
+}
+
+public void tankDriveWithFeedforwardPID(double leftVelocitySetpoint, double rightVelocitySetpoint) {
+    m_leftMotors.setVoltage(feedforward.calculate(leftVelocitySetpoint)
+        + leftPID.calculate(m_leftEncoder.getVelocity(), leftVelocitySetpoint));
+    m_rightMotors.setVoltage(feedforward.calculate(rightVelocitySetpoint)
+        + rightPID.calculate(-m_rightEncoder.getVelocity(), rightVelocitySetpoint));
+  m_drive.feed();
+}
+
+public void reset(){
+  m_gyro.reset();
+  m_leftEncoder.setPosition(0);
+  m_rightEncoder.setPosition(0);
+  m_odometry.resetPosition(new Pose2d(), Rotation2d.fromDegrees(getHeading()));
+}
+
   /**
    * Drives the robot using arcade controls.
    *
@@ -157,6 +214,16 @@ public class DriveSubsystem extends SubsystemBase {
     rightMotor1.stopMotor();
     rightMotor2.stopMotor();
   }  
+
+  public double getHeadingCW() {
+    // Not negating
+    return Math.IEEEremainder(-m_gyro.getAngle(), 360);
+  }
+
+  public double getTurnRateCW() {
+    // Not negating
+    return -m_gyro.getRate();
+  }
 
 
 }
