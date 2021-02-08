@@ -49,7 +49,6 @@ public class SlewLimiter1108 {
   public double calculate(double input) {
     double currentTime = Timer.getFPGATimestamp();
     double elapsedTime = currentTime - m_prevTime;
-    double inputChange = input - m_prevVal;
     if (input - m_prevVal < 0) {
       m_prevVal +=
         MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
