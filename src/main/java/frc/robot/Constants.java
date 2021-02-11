@@ -53,6 +53,10 @@ public final class Constants {
     public static final double kTurnRateToleranceDegPerS = 8;
   }
 
+  public static final class ShooterConstants {
+    public static final int kRightMotorPort = 20;
+  }
+
   public static final class IntakeConstants {
     public static final int kFrontIntakePort = 10;
     public static final int kBackIntakePort = 11;

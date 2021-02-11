@@ -51,9 +51,9 @@ public class DriveSubsystem extends SubsystemBase {
   public static final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
   private double slewSpeedA = 5;  // in units/s
-  private double slewSpeedD = 20;
+  private double slewSpeedD = 5;
   private double slewTurnA = 5;
-  private double slewTurnD = 20;
+  private double slewTurnD = 5;
   private final SlewLimiter1108 m_speedSlew = new SlewLimiter1108(slewSpeedA,slewSpeedD);
   private final SlewLimiter1108 m_turnSlew = new SlewLimiter1108(slewTurnA, slewTurnD);
 

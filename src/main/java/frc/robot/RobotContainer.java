@@ -13,6 +13,7 @@ import frc.robot.commands.auto.ExampleTrajectory;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -31,6 +32,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
+  private final ShooterSubsystem m_shooter = new ShooterSubsystem();    
 
   private final Trajectories m_path = new Trajectories(m_robotDrive);
 
@@ -76,6 +78,10 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kBumperLeft.value)
         .whenPressed(() -> m_intake.start())
         .whenReleased(() -> m_intake.stop());
+
+        new JoystickButton(m_driverController, Button.kA.value)
+        .whenPressed(() -> m_shooter.start())
+        .whenReleased(() -> m_shooter.stop());
 
     new JoystickButton(m_driverController, Button.kX.value)
         .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
