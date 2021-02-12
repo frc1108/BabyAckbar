@@ -62,6 +62,9 @@ public final class Constants {
     public static final int kFrontIntakePort = 10;
     public static final int kBackIntakePort = 11;
   }
+  public static final class HotDogConstants {
+    public static final int kHotDogPort = 30;
+  }
 
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(8);
