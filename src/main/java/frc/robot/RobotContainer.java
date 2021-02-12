@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -93,6 +94,14 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, Button.kX.value)
         .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
+
+    new POVButton(m_driverController, 0)
+        .whenPressed(() -> m_shooter.hoodUp())
+        .whenReleased(() -> m_shooter.hoodStop());
+
+    new POVButton(m_driverController, 180)
+        .whenPressed(() -> m_shooter.hoodDown())
+        .whenReleased(() -> m_shooter.hoodStop());
   }
 
   /**
