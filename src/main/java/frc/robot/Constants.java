@@ -55,6 +55,7 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int kRightMotorPort = 20;
+    public static final int kLeftMotorPort = 21;
   }
 
   public static final class IntakeConstants {

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -16,6 +17,7 @@ import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final CANSparkMax rightMotor = new CANSparkMax(ShooterConstants.kRightMotorPort, MotorType.kBrushless);
+  private final CANSparkMax leftMotor = new CANSparkMax(ShooterConstants.kLeftMotorPort, MotorType.kBrushless);
 private CANEncoder m_encoder;
 public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 private CANPIDController m_pidController;
@@ -23,9 +25,13 @@ double m_setPoint;
 
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
+    leftMotor.restoreFactoryDefaults();
     rightMotor.restoreFactoryDefaults();
     m_pidController = rightMotor.getPIDController();
     m_encoder = rightMotor.getEncoder();
+    leftMotor.follow(rightMotor, true);
+    leftMotor.setIdleMode(IdleMode.kCoast);
+    rightMotor.setIdleMode(IdleMode.kCoast);
     kP = 6e-5; 
     kI = 0;
     kD = 0; 
