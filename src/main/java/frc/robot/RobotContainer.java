@@ -12,6 +12,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.auto.ExampleTrajectory;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.HotDog;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,6 +32,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
+  private final HotDog m_hotDog = new HotDog();
 
   private final Trajectories m_path = new Trajectories(m_robotDrive);
 
@@ -76,6 +78,10 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kBumperLeft.value)
         .whenPressed(() -> m_intake.start())
         .whenReleased(() -> m_intake.stop());
+
+    new JoystickButton(m_driverController, Button.kB.value)
+        .whenPressed(() -> m_hotDog.start())
+        .whenReleased(() -> m_hotDog.stop());
 
     new JoystickButton(m_driverController, Button.kX.value)
         .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
