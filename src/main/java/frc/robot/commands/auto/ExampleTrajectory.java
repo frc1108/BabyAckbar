@@ -28,7 +28,7 @@ public class ExampleTrajectory extends SequentialCommandGroup {
           s_trajectory.getInitialPose(s_trajectory.centerAuto8Cell[0]),
           s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[0]),
           s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[1]),
-          new FieldOrientedTurn(180, drive)
+          new FieldOrientedTurn(180, drive).withTimeout(1)
           //s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[2])
           .andThen(() -> drive.arcadeDrive(0, 0))
          );

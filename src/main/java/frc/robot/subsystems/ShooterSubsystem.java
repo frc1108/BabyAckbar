@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
+import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,6 +22,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final CANSparkMax rightMotor = new CANSparkMax(ShooterConstants.kRightMotorPort, MotorType.kBrushless);
   private final CANSparkMax leftMotor = new CANSparkMax(ShooterConstants.kLeftMotorPort, MotorType.kBrushless);
   private final VictorSPX hoodMotor = new VictorSPX(ShooterConstants.kHoodMotorPort);
+  private final Encoder hoodEncoder = new Encoder(ShooterConstants.kHoodEncoderPortA,ShooterConstants.kHoodEncoderPortB); 
   // private CANEncoder m_encoder;
 // public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 // private CANPIDController m_pidController;
@@ -88,6 +90,7 @@ public class ShooterSubsystem extends SubsystemBase {
     
     // SmartDashboard.putNumber("SetPoint", m_setPoint);
     // SmartDashboard.putNumber("ProcessVariable", m_encoder.getVelocity());
+    SmartDashboard.putNumber("Encoder Distance", getEncoderDistance());
   }
 
   public void stop() {
@@ -107,6 +110,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void hoodStop(){
     hoodMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  public double getEncoderDistance(){
+    return hoodEncoder.getDistance();
   }
   
   //   public void setSetPoint(double setPoint) {
