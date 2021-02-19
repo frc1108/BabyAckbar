@@ -9,17 +9,20 @@ import static edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.auto.ExampleTrajectory;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HotDog;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.commands.auto.Barrel;
+import frc.robot.commands.auto.Bounce;
+import frc.robot.commands.auto.Slalom;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -40,7 +43,8 @@ public class RobotContainer {
   private final Trajectories m_path = new Trajectories(m_robotDrive);
 
   // A chooser for autonomous commands
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  @Log(tabName = "DriveSubsystem")
+  SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -49,6 +53,10 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
+    autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
+    autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
 
     m_robotDrive.setMaxOutput(defaultSpeed);
 
@@ -84,7 +92,7 @@ public class RobotContainer {
 
 
         new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(() -> m_shooter.start())
+        .whenPressed(() -> m_shooter.startPID())
         .whenReleased(() -> m_shooter.stop());
     
     new JoystickButton(m_driverController, Button.kB.value)
@@ -110,7 +118,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new ExampleTrajectory(m_path,m_robotDrive);
+   // return new ExampleTrajectory(m_path,m_robotDrive);
+   return autoChooser.getSelected();
   }
 
   public void reset(){

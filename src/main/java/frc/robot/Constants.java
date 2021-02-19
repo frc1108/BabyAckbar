@@ -60,6 +60,16 @@ public final class Constants {
 
     public static final int kHoodEncoderPortA = 0;
     public static final int kHoodEncoderPortB = 1;
+
+    public static final double kP = 0.0012;
+    public static final double kI = 0.0;
+    public static final double kD = 0.00012;
+    public static final double kIz = 0.0;
+    public static final double kFF = 0.0001875;
+    public static final double kMinOutput = -1;
+    public static final double kMaxOutput = 1;
+    public static final double kmaxRPM = 5700;
+
   }
 
   public static final class IntakeConstants {

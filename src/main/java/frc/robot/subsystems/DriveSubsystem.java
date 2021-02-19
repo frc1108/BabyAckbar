@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 import com.analog.adis16470.frc.ADIS16470_IMU;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -11,6 +14,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -19,10 +25,18 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.pantherlib.SlewLimiter1108;
+import frc.robot.pantherlib.Trajectory6391;
 
 public class DriveSubsystem extends SubsystemBase {
   // Constructors for Drive subsystem motors 
@@ -225,5 +239,53 @@ public void reset(){
     return -m_gyro.getRate();
   }
 
+/**
+   * Creates a command to follow a Trajectory on the drivetrain.
+   * @param trajectory trajectory to follow
+   * @return command that will run the trajectory
+   */
+  public Command createCommandForTrajectory(Trajectory trajectory, Boolean initPose) {
+    if (initPose) {
+      new InstantCommand(() -> {resetOdometry(trajectory.getInitialPose());});
+    }
 
+    resetEncoders();
+
+    RamseteCommand ramseteCommand =  new RamseteCommand(trajectory, this::getPose,
+    new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+    new SimpleMotorFeedforward(DriveConstants.ksVolts, DriveConstants.kvVoltSecondsPerMeter,
+                    DriveConstants.kaVoltSecondsSquaredPerMeter),
+    DriveConstants.kDriveKinematics, this::getWheelSpeeds,
+    new PIDController(DriveConstants.kPDriveVel, 0, 0),
+    new PIDController(DriveConstants.kPDriveVel, 0, 0), this::tankDriveVolts, this);
+    return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
+  }
+
+  protected static Trajectory loadTrajectory(String trajectoryName) throws IOException {
+    return TrajectoryUtil.fromPathweaverJson(
+        Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", trajectoryName + ".wpilib.json")));
+  }
+
+  public Trajectory generateTrajectory(String trajectoryName, TrajectoryConfig config) {
+    try {
+      var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
+      return Trajectory6391.fromWaypoints(filepath, config);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + trajectoryName, false);
+      return new Trajectory();
+    }
+  }
+  public Trajectory loadTrajectoryFromFile(String filename) {
+    try {
+      return loadTrajectory(filename);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + filename, false);
+      return new Trajectory();
+    }
+  }
+
+  public Trajectory generateTrajectoryFromFile(String filename) {
+      var config = new TrajectoryConfig(1, 3);
+      return generateTrajectory(filename, config);
+  }
 }

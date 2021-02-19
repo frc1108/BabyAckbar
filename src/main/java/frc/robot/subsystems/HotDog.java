@@ -22,6 +22,6 @@ public class HotDog extends SubsystemBase {
     victor0.set(ControlMode.PercentOutput, 0);
   }
   public void start() {
-    victor0.set(ControlMode.PercentOutput, 0.5);
+    victor0.set(ControlMode.PercentOutput, -0.75);
   }
 }

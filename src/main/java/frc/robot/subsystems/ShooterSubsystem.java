@@ -17,87 +17,62 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase implements Loggable {
   private final CANSparkMax rightMotor = new CANSparkMax(ShooterConstants.kRightMotorPort, MotorType.kBrushless);
   private final CANSparkMax leftMotor = new CANSparkMax(ShooterConstants.kLeftMotorPort, MotorType.kBrushless);
   private final VictorSPX hoodMotor = new VictorSPX(ShooterConstants.kHoodMotorPort);
   private final Encoder hoodEncoder = new Encoder(ShooterConstants.kHoodEncoderPortA,ShooterConstants.kHoodEncoderPortB); 
-  // private CANEncoder m_encoder;
+  private CANEncoder m_encoder;
 // public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
-// private CANPIDController m_pidController;
-// double m_setPoint;
+  private CANPIDController m_pidController;
+  private double m_setPoint;
 
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     leftMotor.restoreFactoryDefaults();
     rightMotor.restoreFactoryDefaults();
-    // m_pidController = rightMotor.getPIDController();
+    
     // m_encoder = rightMotor.getEncoder();
     leftMotor.follow(rightMotor, true);
     leftMotor.setIdleMode(IdleMode.kCoast);
     rightMotor.setIdleMode(IdleMode.kCoast);
-    // kP = 0; 
-    // kI = 0;
-    // kD = 0; 
-    // kIz = 0; 
-    // kFF = 0.0; 
-    // kMaxOutput = 1; 
-    // kMinOutput = -1;
-    // maxRPM = 5700;
-    // m_pidController.setP(kP);
-    // m_pidController.setI(kI);
-    // m_pidController.setD(kD);
-    // m_pidController.setIZone(kIz);
-    // m_pidController.setFF(kFF);
-    // m_pidController.setOutputRange(kMinOutput, kMaxOutput);
-    // setSetPoint(3000);
-    // SmartDashboard.putNumber("P Gain", kP);
-    // SmartDashboard.putNumber("I Gain", kI);
-    // SmartDashboard.putNumber("D Gain", kD);
-    // SmartDashboard.putNumber("I Zone", kIz);
-    // SmartDashboard.putNumber("Feed Forward", kFF);
-    // SmartDashboard.putNumber("Max Output", kMaxOutput);
-    // SmartDashboard.putNumber("Min Output", kMinOutput);
-    // SmartDashboard.putNumber("Set Point", m_setPoint);
+    
+    m_encoder = rightMotor.getEncoder();
+    
+    // Initialize PID gains and settings for
+    m_pidController = rightMotor.getPIDController(); // Right motor is leader
+    m_pidController.setP(ShooterConstants.kP);
+    m_pidController.setI(ShooterConstants.kI);
+    m_pidController.setD(ShooterConstants.kD);
+    m_pidController.setIZone(ShooterConstants.kIz);
+    m_pidController.setFF(ShooterConstants.kFF);
+     m_pidController.setOutputRange(ShooterConstants.kMinOutput, ShooterConstants.kMaxOutput);
+    leftMotor.burnFlash();
+    rightMotor.burnFlash();
 
 
   }
 
   @Override
   public void periodic() {
-    // // This method will be called once per scheduler run
-    // double p = SmartDashboard.getNumber("P Gain", 0);
-    // double i = SmartDashboard.getNumber("I Gain", 0);
-    // double d = SmartDashboard.getNumber("D Gain", 0);
-    // double iz = SmartDashboard.getNumber("I Zone", 0);
-    // double ff = SmartDashboard.getNumber("Feed Forward", 0);
-    // double max = SmartDashboard.getNumber("Max Output", 0);
-    // double min = SmartDashboard.getNumber("Min Output", 0);
-    // double set = SmartDashboard.getNumber("Set Point", 0);
-    // if((p != kP)) { m_pidController.setP(p); kP = p; }
-    // if((i != kI)) { m_pidController.setI(i); kI = i; }
-    // if((d != kD)) { m_pidController.setD(d); kD = d; }
-    // if((iz != kIz)) { m_pidController.setIZone(iz); kIz = iz; }
-    // if((ff != kFF)) { m_pidController.setFF(ff); kFF = ff; }
-    // if((max != kMaxOutput) || (min != kMinOutput)) { 
-    //   m_pidController.setOutputRange(min, max); 
-    //   kMinOutput = min; kMaxOutput = max; 
-    // }
-    // if((set != m_setPoint)) {setSetPoint(set); m_setPoint = set; }
-    // m_pidController.setReference(m_setPoint, ControlType.kVelocity);
-    
-    
-    // SmartDashboard.putNumber("SetPoint", m_setPoint);
-    // SmartDashboard.putNumber("ProcessVariable", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Encoder Distance", getEncoderDistance());
+    SmartDashboard.putNumber("SetPoint", m_setPoint);
+    SmartDashboard.putNumber("ProcessVariable", m_encoder.getVelocity());
+    SmartDashboard.putNumber("Hood Encoder Distance", getHoodEncoderDistance());
   }
 
   public void stop() {
     rightMotor.stopMotor();
+    //m_pidController.setReference(0, ControlType.kVelocity);
   }
   public void start() {
     rightMotor.set(0.75);
+  }
+
+  public void startPID() {
+    m_pidController.setReference(m_setPoint, ControlType.kVelocity);
   }
 
   public void hoodUp() {
@@ -112,11 +87,12 @@ public class ShooterSubsystem extends SubsystemBase {
     hoodMotor.set(ControlMode.PercentOutput, 0);
   }
 
-  public double getEncoderDistance(){
+  public double getHoodEncoderDistance(){
     return hoodEncoder.getDistance();
   }
   
-  //   public void setSetPoint(double setPoint) {
-  //     m_setPoint = setPoint;
-  // }
+  @Config(defaultValueNumeric = 3000)
+  public void setSetPoint(double setPoint) {
+       m_setPoint = setPoint;
+   }
 }
