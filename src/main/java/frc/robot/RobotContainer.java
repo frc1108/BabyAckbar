@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.auto.Barrel;
 import frc.robot.commands.auto.Bounce;
 import frc.robot.commands.auto.Slalom;
+import frc.robot.commands.auto.GalacticSearch;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -57,6 +58,7 @@ public class RobotContainer {
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
+    autoChooser.addOption("Galactic", new GalacticSearch(m_robotDrive));
 
     m_robotDrive.setMaxOutput(defaultSpeed);
 
