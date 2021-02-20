@@ -90,6 +90,8 @@ public final class Constants {
     
     public static final double kmaxCentripetalAccelerationMetersPerSecondSq = 0.03;
     public static final double  kDifferentialDriveKinematicsConstraint = 0.3;
+
+    public static final double kBallArea = 0.5;
   }
 
   public static final class OIConstants {
