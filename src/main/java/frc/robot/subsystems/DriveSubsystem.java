@@ -166,7 +166,7 @@ public void reset(){
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    m_drive.arcadeDrive(m_speedSlew.calculate(fwd), 0.8*m_turnSlew.calculate(rot));
+    m_drive.arcadeDrive(m_speedSlew.calculate(-fwd), 0.8*m_turnSlew.calculate(rot));
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
