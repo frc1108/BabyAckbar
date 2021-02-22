@@ -26,9 +26,9 @@ public class ExampleTrajectory extends SequentialCommandGroup {
     super(
           //new InstantCommand(() -> m_hopper.down(),m_hopper).withTimeout(0.1).withInterrupt(m_hopper::isHighSwitchNotSet),
           s_trajectory.getInitialPose(s_trajectory.centerAuto8Cell[0]),
-          s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[0]),
-          s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[1]),
-          new FieldOrientedTurn(180, drive).withTimeout(1)
+          s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[0])
+          //s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[1]),
+          //new FieldOrientedTurn(180, drive).withTimeout(1)
           //s_trajectory.getRamsete(s_trajectory.centerAuto8Cell[2])
           .andThen(() -> drive.arcadeDrive(0, 0))
          );

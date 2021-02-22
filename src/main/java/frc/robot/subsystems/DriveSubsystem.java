@@ -116,10 +116,10 @@ public class DriveSubsystem extends SubsystemBase {
 
 
     public void periodic(){
-      m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getPosition(), -m_rightEncoder.getPosition());
+      m_odometry.update(Rotation2d.fromDegrees(getHeading()), -m_leftEncoder.getPosition(), m_rightEncoder.getPosition());
       SmartDashboard.putNumber("Angle",getHeading());
-      SmartDashboard.putNumber("Left Dist", m_leftEncoder.getPosition());
-      SmartDashboard.putNumber("Right Dist", -m_rightEncoder.getPosition());
+      SmartDashboard.putNumber("Left Dist", -m_leftEncoder.getPosition());
+      SmartDashboard.putNumber("Right Dist", m_rightEncoder.getPosition());
     }
 
     public Pose2d getPose() {
@@ -135,20 +135,20 @@ public class DriveSubsystem extends SubsystemBase {
 
   
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getVelocity(),-m_rightEncoder.getVelocity());
+    return new DifferentialDriveWheelSpeeds(-m_leftEncoder.getVelocity(),m_rightEncoder.getVelocity());
 } 
 
 public void tankDriveVolts(double leftVolts, double rightVolts) {
-    m_leftMotors.setVoltage(leftVolts);
-    m_rightMotors.setVoltage(-rightVolts);
+    m_leftMotors.setVoltage(-leftVolts);
+    m_rightMotors.setVoltage(rightVolts);
     m_drive.feed();
 }
 
 public void tankDriveWithFeedforwardPID(double leftVelocitySetpoint, double rightVelocitySetpoint) {
     m_leftMotors.setVoltage(feedforward.calculate(leftVelocitySetpoint)
-        + leftPID.calculate(m_leftEncoder.getVelocity(), leftVelocitySetpoint));
+        + leftPID.calculate(-m_leftEncoder.getVelocity(), leftVelocitySetpoint));
     m_rightMotors.setVoltage(feedforward.calculate(rightVelocitySetpoint)
-        + rightPID.calculate(-m_rightEncoder.getVelocity(), rightVelocitySetpoint));
+        + rightPID.calculate(m_rightEncoder.getVelocity(), rightVelocitySetpoint));
   m_drive.feed();
 }
 
@@ -189,7 +189,7 @@ public void reset(){
    * @return the average of the TWO encoder readings
    */
   public double getAverageEncoderDistance() {
-    return (m_leftEncoder.getPosition() + m_rightEncoder.getPosition()) / 2.0;
+    return (-m_leftEncoder.getPosition() + m_rightEncoder.getPosition()) / 2.0;
   }
 
   /**

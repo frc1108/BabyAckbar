@@ -39,7 +39,7 @@ public final class Constants {
     public static final double kaVoltSecondsSquaredPerMeter = 0.365;  //0.0435
     public static final double kPDriveVel = 2.24;  //2.4
 
-    public static final Boolean kGyroReversed = false;
+    public static final Boolean kGyroReversed = true;
 
     public static final double kTurnP = 0.0475; //0.94, 0.125
     public static final double kTurnI = 0.00;
@@ -69,6 +69,7 @@ public final class Constants {
     public static final double kMinOutput = -1;
     public static final double kMaxOutput = 1;
     public static final double kmaxRPM = 5700;
+	  public static final double kIdleRPM = 1000;
 
   }
 

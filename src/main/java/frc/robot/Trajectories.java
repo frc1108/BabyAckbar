@@ -57,9 +57,9 @@ public class Trajectories {
                 double divisor = 1.0;
                            
                 centerAuto8Cell[0] = TrajectoryGenerator.generateTrajectory(
-                                List.of(new Pose2d(2.11/divisor,5.82/divisor,new Rotation2d(3.14)),
-                                        new Pose2d(0/divisor,5.82/divisor,new Rotation2d(3.14))), 
-                                configForward);
+                                List.of(new Pose2d(0/divisor,5.82/divisor,new Rotation2d(3.14)),
+                                        new Pose2d(2/divisor,5.82/divisor,new Rotation2d(3.14))), 
+                                configReversed);
                 centerAuto8Cell[1] = TrajectoryGenerator.generateTrajectory(
                                 List.of(new Pose2d(0/divisor,5.82/divisor,new Rotation2d(3.14)),
                                         new Pose2d(1.55/divisor,8.23/divisor,new Rotation2d(4.71))), 

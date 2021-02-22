@@ -16,7 +16,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class GalacticSearch extends SequentialCommandGroup {
    public GalacticSearch(DriveSubsystem m_robotDrive) {
-      TrajectoryConfig config = new TrajectoryConfig(2, 3);
+      TrajectoryConfig config = new TrajectoryConfig(1, 2);
       Trajectory trajectory1R = m_robotDrive.generateTrajectory("GalacticSearch1R", config);        
       Trajectory trajectory1B = m_robotDrive.generateTrajectory("GalacticSearch1B", config);        
       Trajectory trajectory2R = m_robotDrive.generateTrajectory("GalacticSearch2R", config);        
@@ -72,22 +72,22 @@ public class GalacticSearch extends SequentialCommandGroup {
             Map.entry("1R", 
                // Reset robot pose to the beginning of 1R and Run it
                m_robotDrive.createCommandForTrajectory(trajectory1R, true)
-                           .beforeStarting(() -> m_robotDrive.resetOdometry(trajectory1R.getInitialPose()))
+                           //.beforeStarting(() -> m_robotDrive.resetOdometry(trajectory1R.getInitialPose()))
                            .withTimeout(50).withName("GalacticSearch1R")),
             Map.entry("1B", 
                // Reset robot pose to the beginning of 1B and Run it
                m_robotDrive.createCommandForTrajectory(trajectory1B, true)
-                           .beforeStarting(() -> m_robotDrive.resetOdometry(trajectory1B.getInitialPose()))
+                           //.beforeStarting(() -> m_robotDrive.resetOdometry(trajectory1B.getInitialPose()))
                            .withTimeout(50).withName("GalacticSearch1B")),
             Map.entry("2R", 
                // Reset robot pose to the beginning of 2R and Run it
                m_robotDrive.createCommandForTrajectory(trajectory2R, true)
-                           .beforeStarting(() -> m_robotDrive.resetOdometry(trajectory2R.getInitialPose()))
+                           //.beforeStarting(() -> m_robotDrive.resetOdometry(trajectory2R.getInitialPose()))
                            .withTimeout(50).withName("GalacticSearch2R")),
             Map.entry("2B", 
                // Reset robot pose to the beginning of 2B and Run it
                m_robotDrive.createCommandForTrajectory(trajectory2B, true)
-                           .beforeStarting(() -> m_robotDrive.resetOdometry(trajectory2B.getInitialPose()))
+                           //.beforeStarting(() -> m_robotDrive.resetOdometry(trajectory2B.getInitialPose()))
                            .withTimeout(50).withName("GalacticSearch2B"))),
          i)
       );

@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HotDog;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.auto.Barrel;
 import frc.robot.commands.auto.Bounce;
+import frc.robot.commands.auto.ExampleTrajectory;
 import frc.robot.commands.auto.Slalom;
 import frc.robot.commands.auto.GalacticSearch;
 
@@ -94,8 +96,8 @@ public class RobotContainer {
 
 
         new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(() -> m_shooter.startPID())
-        .whenReleased(() -> m_shooter.stop());
+        .whenPressed(() -> m_shooter.start())
+        .whenReleased(() -> m_shooter.idle(ShooterConstants.kIdleRPM));
     
     new JoystickButton(m_driverController, Button.kB.value)
         .whenPressed(() -> m_hotDog.start())
@@ -120,7 +122,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-   // return new ExampleTrajectory(m_path,m_robotDrive);
+   //return new ExampleTrajectory(m_path,m_robotDrive);
    return autoChooser.getSelected();
   }
 
