@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Servo;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +25,7 @@ public class ShooterSubsystem extends SubsystemBase implements Loggable {
   private final CANSparkMax rightMotor = new CANSparkMax(ShooterConstants.kRightMotorPort, MotorType.kBrushless);
   private final CANSparkMax leftMotor = new CANSparkMax(ShooterConstants.kLeftMotorPort, MotorType.kBrushless);
   private final VictorSPX hoodMotor = new VictorSPX(ShooterConstants.kHoodMotorPort);
+  private final Servo ballServo = new Servo(ShooterConstants.kStopperServoPort);
   private final Encoder hoodEncoder = new Encoder(ShooterConstants.kHoodEncoderPortA,ShooterConstants.kHoodEncoderPortB); 
   private CANEncoder m_encoder;
 // public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
@@ -61,11 +63,11 @@ public class ShooterSubsystem extends SubsystemBase implements Loggable {
     SmartDashboard.putNumber("SetPoint", m_setPoint);
     SmartDashboard.putNumber("ProcessVariable", m_encoder.getVelocity());
     SmartDashboard.putNumber("Hood Encoder Distance", getHoodEncoderDistance());
+    SmartDashboard.putNumber("Hood Angle", getHoodAngle());
   }
 
   public void stop() {
     rightMotor.stopMotor();
-    //m_pidController.setReference(0, ControlType.kVelocity);
   }
   public void start() {
     rightMotor.set(0.75);
@@ -88,7 +90,27 @@ public class ShooterSubsystem extends SubsystemBase implements Loggable {
   }
 
   public double getHoodEncoderDistance(){
-    return hoodEncoder.getDistance();
+    return -hoodEncoder.getDistance();
+  }
+
+  public void resetEncoderDistance(){
+    hoodEncoder.reset();
+  }
+  
+
+  public double getHoodAngle(){
+    return ShooterConstants.kHoodStartingAngle
+           -(getHoodEncoderDistance()*ShooterConstants.kHoodDegreesPerCount);
+  }
+
+  private void servoDown(){ ballServo.set(0.15);}
+  private void servoUp(){ ballServo.set(0.6);}
+  public void toggleServo() {
+    if (ballServo.get() < 0.2) {
+      servoUp();
+    } else {
+      servoDown();
+    }
   }
   
   @Config(defaultValueNumeric = 3000)
