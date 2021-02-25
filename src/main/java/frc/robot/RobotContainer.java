@@ -41,7 +41,7 @@ public class RobotContainer {
   private final ShooterSubsystem m_shooter = new ShooterSubsystem(); 
   private final HotDog m_hotDog = new HotDog();
   
-  private final Trajectories m_path = new Trajectories(m_robotDrive);
+  //private final Trajectories m_path = new Trajectories(m_robotDrive);
 
   // A chooser for autonomous commands
   @Log(tabName = "DriveSubsystem")
@@ -105,6 +105,9 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kX.value)
         .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
 
+    new JoystickButton(m_driverController, Button.kY.value)
+        .whenPressed(() -> m_shooter.toggleServo());
+
     new POVButton(m_driverController, 0)
         .whenPressed(() -> m_shooter.hoodUp())
         .whenReleased(() -> m_shooter.hoodStop());
@@ -112,6 +115,9 @@ public class RobotContainer {
     new POVButton(m_driverController, 180)
         .whenPressed(() -> m_shooter.hoodDown())
         .whenReleased(() -> m_shooter.hoodStop());
+
+    new JoystickButton(m_driverController, Button.kStart.value)
+    .whenPressed(() -> m_shooter.resetEncoderDistance());
   }
 
   /**
