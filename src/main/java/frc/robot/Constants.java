@@ -58,7 +58,7 @@ public final class Constants {
 
     public static final int kRightMotorPort = 20;
     public static final int kLeftMotorPort = 21;
-    public static final int kHoodMotorPort = 30;
+    public static final int kHoodMotorPort = 22;
 
     public static final int kHoodEncoderPortA = 0;
     public static final int kHoodEncoderPortB = 1;
@@ -78,7 +78,7 @@ public final class Constants {
     public static final double kHoodStartingAngle = 75.0; //estimate
     public static final double kHoodDegreesPerCount = (75.0 / 120); //estimate
 
-
+	  public static final double kIdleRPM = 1500;
   }
 
   public static final class IntakeConstants {
@@ -86,7 +86,7 @@ public final class Constants {
     public static final int kBackIntakePort = 41;
   }
   public static final class HotDogConstants {
-    public static final int kHotDogPort = 31; //30
+    public static final int kHotDogPort = 30; //30
   }
 
   public static final class AutoConstants {

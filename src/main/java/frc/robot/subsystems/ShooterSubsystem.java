@@ -9,6 +9,7 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -36,6 +37,8 @@ public class ShooterSubsystem extends SubsystemBase implements Loggable {
   public ShooterSubsystem() {
     leftMotor.restoreFactoryDefaults();
     rightMotor.restoreFactoryDefaults();
+    hoodMotor.configFactoryDefault();
+    hoodMotor.setNeutralMode(NeutralMode.Brake);
     
     // m_encoder = rightMotor.getEncoder();
     leftMotor.follow(rightMotor, true);
@@ -69,12 +72,17 @@ public class ShooterSubsystem extends SubsystemBase implements Loggable {
   public void stop() {
     rightMotor.stopMotor();
   }
+
   public void start() {
-    rightMotor.set(0.75);
+    m_pidController.setReference(m_setPoint, ControlType.kVelocity);
   }
 
-  public void startPID() {
-    m_pidController.setReference(m_setPoint, ControlType.kVelocity);
+  public void idle(double idleRPM) {
+    if (idleRPM < m_encoder.getVelocity()) {
+      rightMotor.stopMotor();
+    } else {
+      m_pidController.setReference(idleRPM, ControlType.kVelocity);
+    }
   }
 
   public void hoodUp() {
@@ -103,8 +111,9 @@ public class ShooterSubsystem extends SubsystemBase implements Loggable {
            -(getHoodEncoderDistance()*ShooterConstants.kHoodDegreesPerCount);
   }
 
-  private void servoDown(){ ballServo.set(0.15);}
-  private void servoUp(){ ballServo.set(0.6);}
+  
+  private void servoDown(){ ballServo.set(0);}
+  private void servoUp(){ ballServo.set(0.5);}
   public void toggleServo() {
     if (ballServo.get() < 0.2) {
       servoUp();

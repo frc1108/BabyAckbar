@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HotDog;
@@ -94,16 +95,16 @@ public class RobotContainer {
 
 
         new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(() -> m_shooter.startPID())
-        .whenReleased(() -> m_shooter.stop());
+        .whenPressed(() -> m_shooter.start())
+        .whenReleased(() -> m_shooter.idle(ShooterConstants.kIdleRPM));
     
     new JoystickButton(m_driverController, Button.kB.value)
         .whenPressed(() -> m_hotDog.start())
         .whenReleased(() -> m_hotDog.stop());
 
 
-    new JoystickButton(m_driverController, Button.kX.value)
-        .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
+    //new JoystickButton(m_driverController, Button.kX.value)
+    //    .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
 
     new JoystickButton(m_driverController, Button.kY.value)
         .whenPressed(() -> m_shooter.toggleServo());
