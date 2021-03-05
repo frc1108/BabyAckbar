@@ -4,16 +4,21 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.IntakeConstants;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
   CANSparkMax frontMotor = new CANSparkMax(IntakeConstants.kFrontIntakePort, MotorType.kBrushless);
   CANSparkMax backMotor = new CANSparkMax(IntakeConstants.kBackIntakePort, MotorType.kBrushless);
+  private final VictorSPX m_dropMotor = new VictorSPX(IntakeConstants.kDropMotorPort);
+
+
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     // Stops drive motors
@@ -48,6 +53,14 @@ public class IntakeSubsystem extends SubsystemBase {
   public void start() {
     frontMotor.set(-1);
     backMotor.set(-1); 
+  }
+
+  public void drop() {
+
+  }
+
+  public void pickup() {
+
   }
   
 }

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.commands.GalacticSearchParallelGroup;
 import frc.robot.commands.auto.Barrel;
 import frc.robot.commands.auto.Bounce;
 import frc.robot.commands.auto.Slalom;
@@ -59,7 +60,7 @@ public class RobotContainer {
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
-    autoChooser.addOption("Galactic", new GalacticSearch(m_robotDrive));
+    autoChooser.addOption("Galactic", new GalacticSearchParallelGroup(m_robotDrive,m_intake));
 
     m_robotDrive.setMaxOutput(defaultSpeed);
 

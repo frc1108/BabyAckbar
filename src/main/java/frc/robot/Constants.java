@@ -84,6 +84,7 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final int kFrontIntakePort = 40;
     public static final int kBackIntakePort = 41;
+	  public static int kDropMotorPort = 42;
   }
   public static final class HotDogConstants {
     public static final int kHotDogPort = 30; //30
