@@ -12,7 +12,9 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.commands.intake.ManualIntake;
+import frc.robot.commands.shooter.HoodPositionZero;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.HotDog;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -42,6 +44,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
   private final ShooterSubsystem m_shooter = new ShooterSubsystem(); 
+  private final HoodSubsystem m_hood = new HoodSubsystem(); 
   private final HotDog m_hotDog = new HotDog();
   
   //private final Trajectories m_path = new Trajectories(m_robotDrive);
@@ -115,15 +118,18 @@ public class RobotContainer {
         .whenPressed(() -> m_shooter.toggleServo());
 
     new POVButton(m_driverController, 0)
-        .whenPressed(() -> m_shooter.hoodUp())
-        .whenReleased(() -> m_shooter.hoodStop());
+        .whenPressed(() -> m_hood.hoodUp())
+        .whenReleased(() -> m_hood.hoodStop());
+    
+    new POVButton(m_driverController, 90)
+        .whenPressed(new HoodPositionZero(m_hood));
 
     new POVButton(m_driverController, 180)
-        .whenPressed(() -> m_shooter.hoodDown())
-        .whenReleased(() -> m_shooter.hoodStop());
+        .whenPressed(() -> m_hood.hoodDown())
+        .whenReleased(() -> m_hood.hoodStop());
 
     new JoystickButton(m_driverController, Button.kStart.value)
-    .whenPressed(() -> m_shooter.resetEncoderDistance());
+    .whenPressed(() -> m_hood.resetEncoderDistance());
   }
 
   /**

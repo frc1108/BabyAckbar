@@ -79,6 +79,8 @@ public final class Constants {
     public static final double kHoodDegreesPerCount = (75.0 / 120); //estimate
 
 	  public static final double kIdleRPM = 1500;
+
+	public static int kLowSwitchPort = 2;
   }
 
   public static final class IntakeConstants {
