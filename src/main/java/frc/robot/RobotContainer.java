@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.drive.FieldOrientedTurn;
+import frc.robot.commands.intake.ManualIntake;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HotDog;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -75,6 +76,9 @@ public class RobotContainer {
                     m_driverController.getY(GenericHID.Hand.kLeft),
                     m_driverController.getX(GenericHID.Hand.kRight)),
             m_robotDrive));
+
+            m_intake.setDefaultCommand(
+                new ManualIntake(m_intake, ()-> (m_driverController.getTriggerAxis(GenericHID.Hand.kRight)-m_driverController.getTriggerAxis(GenericHID.Hand.kLeft))));
   }
 
   /**

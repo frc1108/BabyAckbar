@@ -4,16 +4,19 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants.IntakeConstants;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class IntakeSubsystem extends SubsystemBase {
+public class IntakeSubsystem extends SubsystemBase implements Loggable{
   CANSparkMax frontMotor = new CANSparkMax(IntakeConstants.kFrontIntakePort, MotorType.kBrushless);
   CANSparkMax backMotor = new CANSparkMax(IntakeConstants.kBackIntakePort, MotorType.kBrushless);
   private final VictorSPX m_dropMotor = new VictorSPX(IntakeConstants.kDropMotorPort);
@@ -56,11 +59,18 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void drop() {
-
+    m_dropMotor.set(ControlMode.PercentOutput,0.5);
   }
 
   public void pickup() {
-
+    m_dropMotor.set(ControlMode.PercentOutput,-0.5);
   }
-  
+  public void stopDeploy() {
+    m_dropMotor.set(ControlMode.PercentOutput,0);
+  }
+
+  @Log
+  public void manualDeploy(double intake_spd) {
+    m_dropMotor.set(ControlMode.PercentOutput,intake_spd); 
+  }
 }
