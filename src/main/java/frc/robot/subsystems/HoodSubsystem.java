@@ -22,8 +22,8 @@ public class HoodSubsystem extends SubsystemBase implements Loggable {
   private final Encoder hoodEncoder = new Encoder(ShooterConstants.kHoodEncoderPortA,ShooterConstants.kHoodEncoderPortB); 
   private final DigitalInput m_lowSwitch = new DigitalInput(ShooterConstants.kLowSwitchPort);
   private double m_setPoint;
+  private double m_hoodSpeed;
 
-  
   public HoodSubsystem() {
     hoodMotor.configFactoryDefault();
     hoodMotor.setNeutralMode(NeutralMode.Brake);
@@ -33,21 +33,18 @@ public class HoodSubsystem extends SubsystemBase implements Loggable {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     SmartDashboard.putNumber("Hood Encoder Distance", getHoodEncoderDistance());
     SmartDashboard.putNumber("Hood Angle", getHoodAngle());
   }
 
-  
-  public void hoodUp() {
-
-    hoodMotor.set(ControlMode.PercentOutput, -0.5);
-  }
-
-  public void hoodDown() {
-    if (m_lowSwitch.get()) {
-    hoodMotor.set(ControlMode.PercentOutput, 0.5);
-    }
+  /**
+   * 
+   * @param speed positive speed 0-1 hood rotates upward
+   */
+  public void setHood(double speed) {
+    if (speed < 0) {speed = getLowSwitch()?0:speed;} // stops at bottom when REV mag limit switch active
+    if (speed > 0) {speed = (getHoodEncoderDistance() > 150)?0:speed;} // soft limit when encoder count high 
+    hoodMotor.set(ControlMode.PercentOutput,-speed);  // invert speed so negative input is down 
   }
 
   public void hoodStop() {
@@ -70,17 +67,4 @@ public class HoodSubsystem extends SubsystemBase implements Loggable {
   public boolean getLowSwitch(){
    return !m_lowSwitch.get();  // logic inverted
   }
-
-  public void increaseSetPoint(double counts) {
-    m_setPoint += counts;
-  }
-
-  public void decreaseSetPoint(double counts) {
-   m_setPoint -= counts;
- }
-
- public void zeroHoodPosition(){
-   m_setPoint = 0;
-   hoodEncoder.reset();
- }
 }

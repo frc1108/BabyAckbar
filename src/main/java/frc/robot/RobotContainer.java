@@ -12,7 +12,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.commands.intake.ManualIntake;
-import frc.robot.commands.shooter.HoodPositionZero;
+import frc.robot.commands.hood.HoodPositionZero;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.HotDog;
@@ -55,6 +55,7 @@ public class RobotContainer {
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -82,6 +83,11 @@ public class RobotContainer {
 
             m_intake.setDefaultCommand(
                 new ManualIntake(m_intake, ()-> (m_driverController.getTriggerAxis(GenericHID.Hand.kRight)-m_driverController.getTriggerAxis(GenericHID.Hand.kLeft))));
+
+            m_hood.setDefaultCommand(
+                new RunCommand(
+                    ()->
+                    m_hood.setHood(-m_operatorController.getY(GenericHID.Hand.kLeft)),m_hood));
   }
 
   /**
@@ -117,18 +123,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kY.value)
         .whenPressed(() -> m_shooter.toggleServo());
 
-    new POVButton(m_driverController, 0)
-        .whenPressed(() -> m_hood.hoodUp())
-        .whenReleased(() -> m_hood.hoodStop());
-    
-    new POVButton(m_driverController, 90)
-        .whenPressed(new HoodPositionZero(m_hood));
-
-    new POVButton(m_driverController, 180)
-        .whenPressed(() -> m_hood.hoodDown())
-        .whenReleased(() -> m_hood.hoodStop());
-
-    new JoystickButton(m_driverController, Button.kStart.value)
+    new JoystickButton(m_operatorController, Button.kStart.value)
     .whenPressed(() -> m_hood.resetEncoderDistance());
   }
 

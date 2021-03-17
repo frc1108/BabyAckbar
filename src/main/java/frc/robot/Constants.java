@@ -72,15 +72,16 @@ public final class Constants {
     public static final double kMaxOutput = 1;
     public static final double kmaxRPM = 5700;
 
-    // public static final double kHoodEncoderBCountPerRev = 44.4;
-    // public static final double kHoodScrewInchPerRev = 0.5;
-    // public static final double kHoodScrewDegreesPerInch = 75.0/11; //estimate
-    public static final double kHoodStartingAngle = 75.0; //estimate
-    public static final double kHoodDegreesPerCount = (75.0 / 120); //estimate
+    public static final double kHoodStartingAngle = 66.0; //measured via phone app
+    public static final double kHoodDegreesPerCount = ((93-24) / 169.5); //phone app measurement
 
 	  public static final double kIdleRPM = 1500;
 
 	public static int kLowSwitchPort = 2;
+
+	public static double kHoodP = 0.01;
+	public static double kHoodI = 0;
+	public static double kHoodD = 0;
   }
 
   public static final class IntakeConstants {
@@ -108,5 +109,6 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+	  public static int kOperatorControllerPort = 1;
   }
 }
