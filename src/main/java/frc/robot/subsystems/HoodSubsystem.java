@@ -45,7 +45,7 @@ public class HoodSubsystem extends SubsystemBase implements Loggable {
   }
 
   public void hoodDown() {
-    if (m_lowSwitch.get()) {
+    if (!m_lowSwitch.get()) {
     hoodMotor.set(ControlMode.PercentOutput, 0.5);
     }
   }

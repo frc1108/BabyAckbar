@@ -77,15 +77,15 @@ public class ShooterSubsystem extends SubsystemBase implements Loggable {
   }
 
   private void servoDown() { 
-    ballServo.set(0);
+    ballServo.set(0.15);
   }
 
   private void servoUp() {
-    ballServo.set(0.5);
+    ballServo.set(0.75);
   }
 
   public void toggleServo() {
-    if (ballServo.get() < 0.2) {
+    if (ballServo.get() < 0.3) {
       servoUp();
     } else {
       servoDown();

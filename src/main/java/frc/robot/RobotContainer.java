@@ -12,7 +12,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.drive.FieldOrientedTurn;
 import frc.robot.commands.intake.ManualIntake;
-import frc.robot.commands.shooter.HoodPositionZero;
+import frc.robot.commands.hood.HoodPositionZero;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.HotDog;
@@ -44,7 +44,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
   private final ShooterSubsystem m_shooter = new ShooterSubsystem(); 
-  private final HoodSubsystem m_hood = new HoodSubsystem(); 
+  @Log private final HoodSubsystem m_hood = new HoodSubsystem(); 
   private final HotDog m_hotDog = new HotDog();
   
   //private final Trajectories m_path = new Trajectories(m_robotDrive);
