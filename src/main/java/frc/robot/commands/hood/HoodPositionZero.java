@@ -6,7 +6,6 @@ package frc.robot.commands.hood;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 
 public class HoodPositionZero extends CommandBase {
   private final HoodSubsystem m_hood;
@@ -24,12 +23,16 @@ public class HoodPositionZero extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_hood.hoodDown();
+    m_hood.down();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    if(!interrupted) {
+      m_hood.reset();
+    }
+  }
 
   // Returns true when the command should end.
   @Override

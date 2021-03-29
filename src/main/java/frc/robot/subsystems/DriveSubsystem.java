@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -35,43 +36,32 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.pantherlib.SlewLimiter1108;
 import frc.robot.pantherlib.Trajectory6391;
 
 public class DriveSubsystem extends SubsystemBase {
-  // Constructors for Drive subsystem motors 
   CANSparkMax leftMotor1 = new CANSparkMax(DriveConstants.kLeftMotor1Port, MotorType.kBrushless);
   CANSparkMax leftMotor2 = new CANSparkMax(DriveConstants.kLeftMotor2Port, MotorType.kBrushless);
   CANSparkMax rightMotor1 = new CANSparkMax(DriveConstants.kRightMotor1Port, MotorType.kBrushless);
   CANSparkMax rightMotor2 = new CANSparkMax(DriveConstants.kRightMotor2Port, MotorType.kBrushless);
 
-  // The motors on the left side of the drive.
   private final SpeedControllerGroup m_leftMotors = new SpeedControllerGroup(leftMotor1, leftMotor2);
   private final SpeedControllerGroup m_rightMotors = new SpeedControllerGroup(rightMotor1, rightMotor2);
-
-  // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
-  private final PIDController leftPID = new PIDController(DriveConstants.kPDriveVel, 0, 0);
-  private final PIDController rightPID = new PIDController(DriveConstants.kPDriveVel, 0, 0);
-  private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(DriveConstants.ksVolts,DriveConstants.kvVoltSecondsPerMeter,DriveConstants.kaVoltSecondsSquaredPerMeter);
-  private final DifferentialDriveOdometry m_odometry;
-
-  // The left-side drive encoder
+  private final PIDController m_leftPID = new PIDController(DriveConstants.kPDriveVel, 0, 0);
+  private final PIDController m_rightPID = new PIDController(DriveConstants.kPDriveVel, 0, 0);
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.ksVolts,DriveConstants.kvVoltSecondsPerMeter,DriveConstants.kaVoltSecondsSquaredPerMeter);
+  
+  public double m_slewSpeed = 5;  // in units/s
+  public double m_slewTurn = 5;
+  private final SlewRateLimiter m_speedSlew = new SlewRateLimiter(m_slewSpeed);
+  private final SlewRateLimiter m_turnSlew = new SlewRateLimiter(m_slewTurn);
+  
   private final CANEncoder m_leftEncoder;
   private final CANEncoder m_rightEncoder;
+  private final DifferentialDriveOdometry m_odometry;
+  private static final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
-  // The gyro 
-  public static final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-
-  private double slewSpeedA = 5;  // in units/s
-  private double slewSpeedD = 5;
-  private double slewTurnA = 5;
-  private double slewTurnD = 5;
-  private final SlewLimiter1108 m_speedSlew = new SlewLimiter1108(slewSpeedA,slewSpeedD);
-  private final SlewLimiter1108 m_turnSlew = new SlewLimiter1108(slewTurnA, slewTurnD);
-
-  /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Stops drive motors
     stop();
@@ -145,10 +135,10 @@ public void tankDriveVolts(double leftVolts, double rightVolts) {
 }
 
 public void tankDriveWithFeedforwardPID(double leftVelocitySetpoint, double rightVelocitySetpoint) {
-    m_leftMotors.setVoltage(feedforward.calculate(leftVelocitySetpoint)
-        + leftPID.calculate(m_leftEncoder.getVelocity(), leftVelocitySetpoint));
-    m_rightMotors.setVoltage(feedforward.calculate(rightVelocitySetpoint)
-        + rightPID.calculate(-m_rightEncoder.getVelocity(), rightVelocitySetpoint));
+    m_leftMotors.setVoltage(m_feedforward.calculate(leftVelocitySetpoint)
+        + m_leftPID.calculate(m_leftEncoder.getVelocity(), leftVelocitySetpoint));
+    m_rightMotors.setVoltage(m_feedforward.calculate(rightVelocitySetpoint)
+        + m_rightPID.calculate(-m_rightEncoder.getVelocity(), rightVelocitySetpoint));
   m_drive.feed();
 }
 

@@ -6,7 +6,9 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
+import edu.wpi.first.wpilibj.Controller;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.GalacticSearchParallelGroup;
 import frc.robot.commands.auto.Barrel;
 import frc.robot.commands.auto.Bounce;
+import frc.robot.commands.auto.DriveOffLine;
 import frc.robot.commands.auto.Slalom;
 import frc.robot.commands.auto.GalacticSearch;
 
@@ -55,12 +58,15 @@ public class RobotContainer {
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  Joystick m_buttonBox = new Joystick(OIConstants.kButtonBoxPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
+    autoChooser.addOption("Drive Off Line", new DriveOffLine(m_robotDrive));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
@@ -81,7 +87,12 @@ public class RobotContainer {
             m_robotDrive));
 
             m_intake.setDefaultCommand(
-                new ManualIntake(m_intake, ()-> (m_driverController.getTriggerAxis(GenericHID.Hand.kRight)-m_driverController.getTriggerAxis(GenericHID.Hand.kLeft))));
+                new ManualIntake(m_intake, ()-> (m_operatorController.getTriggerAxis(GenericHID.Hand.kRight)-m_operatorController.getTriggerAxis(GenericHID.Hand.kLeft))));
+
+            m_hood.setDefaultCommand(
+                new RunCommand(
+                    ()->
+                    m_hood.set(-m_operatorController.getY(GenericHID.Hand.kLeft)),m_hood));
   }
 
   /**
@@ -97,39 +108,27 @@ public class RobotContainer {
         .whenPressed(() -> m_robotDrive.setMaxOutput(triggerSpeed))
         .whenReleased(() -> m_robotDrive.setMaxOutput(defaultSpeed));
 
-    new JoystickButton(m_driverController, Button.kBumperLeft.value)
+    new JoystickButton(m_operatorController, Button.kBumperLeft.value)
         .whenPressed(() -> m_intake.start())
         .whenReleased(() -> m_intake.stop());
 
 
-        new JoystickButton(m_driverController, Button.kA.value)
+        new JoystickButton(m_operatorController, Button.kA.value)
         .whenPressed(() -> m_shooter.start())
         .whenReleased(() -> m_shooter.idle(ShooterConstants.kIdleRPM));
     
-    new JoystickButton(m_driverController, Button.kB.value)
+    new JoystickButton(m_operatorController, Button.kB.value)
         .whenPressed(() -> m_hotDog.start())
         .whenReleased(() -> m_hotDog.stop());
-
 
     //new JoystickButton(m_driverController, Button.kX.value)
     //    .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
 
-    new JoystickButton(m_driverController, Button.kY.value)
+    new JoystickButton(m_operatorController, Button.kY.value)
         .whenPressed(() -> m_shooter.toggleServo());
 
-    new POVButton(m_driverController, 0)
-        .whenPressed(() -> m_hood.hoodUp())
-        .whenReleased(() -> m_hood.hoodStop());
-    
-    new POVButton(m_driverController, 90)
-        .whenPressed(new HoodPositionZero(m_hood));
-
-    new POVButton(m_driverController, 180)
-        .whenPressed(() -> m_hood.hoodDown())
-        .whenReleased(() -> m_hood.hoodStop());
-
-    new JoystickButton(m_driverController, Button.kStart.value)
-    .whenPressed(() -> m_hood.resetEncoderDistance());
+    new JoystickButton(m_operatorController, Button.kStart.value)
+    .whenPressed(() -> m_hood.reset());
   }
 
   /**

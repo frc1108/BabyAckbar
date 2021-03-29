@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -13,13 +13,17 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import frc.robot.Constants.IntakeConstants;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase implements Loggable{
   CANSparkMax frontMotor = new CANSparkMax(IntakeConstants.kFrontIntakePort, MotorType.kBrushless);
   CANSparkMax backMotor = new CANSparkMax(IntakeConstants.kBackIntakePort, MotorType.kBrushless);
-  private final VictorSPX m_dropMotor = new VictorSPX(IntakeConstants.kDropMotorPort);
+  private final WPI_VictorSPX m_dropMotor = new WPI_VictorSPX(IntakeConstants.kDropMotorPort);
+
+  DigitalInput m_lowDropSwitch = new DigitalInput(IntakeConstants.kLowDropSwitchPort);
+  DigitalInput m_highDropSwitch = new DigitalInput(IntakeConstants.kHighDropSwitchPort);
 
 
   /** Creates a new IntakeSubsystem. */
@@ -55,7 +59,7 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
   }
   public void start() {
     frontMotor.set(-1);
-    backMotor.set(-1); 
+    backMotor.set(-0.9); 
   }
 
   public void drop() {
@@ -72,5 +76,15 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
   @Log
   public void manualDeploy(double intake_spd) {
     m_dropMotor.set(ControlMode.PercentOutput,intake_spd); 
+  }
+
+  @Log
+  public boolean getLowDropSwitch(){
+    return m_lowDropSwitch.get();
+  }
+  
+  @Log
+  public boolean getHighDropSwitch(){
+    return m_highDropSwitch.get();
   }
 }

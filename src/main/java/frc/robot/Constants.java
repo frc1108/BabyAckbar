@@ -58,10 +58,6 @@ public final class Constants {
 
     public static final int kRightMotorPort = 20;
     public static final int kLeftMotorPort = 21;
-    public static final int kHoodMotorPort = 22;
-
-    public static final int kHoodEncoderPortA = 0;
-    public static final int kHoodEncoderPortB = 1;
 
     public static final double kP = 0.0012;
     public static final double kI = 0.0;
@@ -70,23 +66,36 @@ public final class Constants {
     public static final double kFF = 0.0001875;
     public static final double kMinOutput = -1;
     public static final double kMaxOutput = 1;
+
     public static final double kmaxRPM = 5700;
-
-    // public static final double kHoodEncoderBCountPerRev = 44.4;
-    // public static final double kHoodScrewInchPerRev = 0.5;
-    // public static final double kHoodScrewDegreesPerInch = 75.0/11; //estimate
-    public static final double kHoodStartingAngle = 75.0; //estimate
-    public static final double kHoodDegreesPerCount = (75.0 / 120); //estimate
-
 	  public static final double kIdleRPM = 1500;
-
-	public static int kLowSwitchPort = 2;
   }
 
+
+
+  public static final class HoodConstants {
+    public static final int kHoodMotorPort = 22;
+
+    public static final int kHoodEncoderPortA = 0;
+    public static final int kHoodEncoderPortB = 1;
+    public static final double kHoodStartingAngle = 66.0; //measured via phone app
+    public static final double kHoodDegreesPerCount = ((93-24) / 169.5); //phone app measurement
+    public static int kLowSwitchPort = 2;
+
+	public static double kHoodP = 0.01;
+	public static double kHoodI = 0;
+	public static double kHoodD = 0;
+
+	public static double kTurnRateToleranceDegPerS;
+
+	public static double kTurnToleranceDeg;
+  }
   public static final class IntakeConstants {
     public static final int kFrontIntakePort = 40;
     public static final int kBackIntakePort = 41;
-	  public static int kDropMotorPort = 42;
+	  public static final int kDropMotorPort = 42;
+	  public static int kLowDropSwitchPort = 7;
+	  public static int kHighDropSwitchPort = 8;
   }
   public static final class HotDogConstants {
     public static final int kHotDogPort = 30; //30
@@ -108,5 +117,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+	  public static int kOperatorControllerPort = 1;
+	public static int kButtonBoxPort = 2;
   }
 }
