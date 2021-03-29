@@ -47,7 +47,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
   private final ShooterSubsystem m_shooter = new ShooterSubsystem(); 
-  private final HoodSubsystem m_hood = new HoodSubsystem(); 
+  @Log private final HoodSubsystem m_hood = new HoodSubsystem(); 
   private final HotDog m_hotDog = new HotDog();
   
   //private final Trajectories m_path = new Trajectories(m_robotDrive);
