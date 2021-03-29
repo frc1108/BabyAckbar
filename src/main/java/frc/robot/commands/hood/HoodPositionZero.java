@@ -23,14 +23,14 @@ public class HoodPositionZero extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_hood.setHood(-0.5);
+    m_hood.down();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     if(!interrupted) {
-      m_hood.resetEncoderDistance();
+      m_hood.reset();
     }
   }
 

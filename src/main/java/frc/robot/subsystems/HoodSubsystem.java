@@ -4,66 +4,70 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.HoodConstants;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
 public class HoodSubsystem extends SubsystemBase implements Loggable {
-  private final VictorSPX hoodMotor = new VictorSPX(ShooterConstants.kHoodMotorPort);
-  private final Encoder hoodEncoder = new Encoder(ShooterConstants.kHoodEncoderPortA,ShooterConstants.kHoodEncoderPortB); 
-  private final DigitalInput m_lowSwitch = new DigitalInput(ShooterConstants.kLowSwitchPort);
-  private double m_setPoint;
-  private double m_hoodSpeed;
+  private final WPI_VictorSPX m_motor = new WPI_VictorSPX(HoodConstants.kHoodMotorPort);
+  private final Encoder m_encoder = new Encoder(HoodConstants.kHoodEncoderPortA,HoodConstants.kHoodEncoderPortB); 
+  private final DigitalInput m_lowSwitch = new DigitalInput(HoodConstants.kLowSwitchPort);
 
   public HoodSubsystem() {
-    hoodMotor.configFactoryDefault();
-    hoodMotor.setNeutralMode(NeutralMode.Brake);
+    m_motor.configFactoryDefault();
+    m_motor.setNeutralMode(NeutralMode.Brake);
 
-    this.setDefaultCommand(new RunCommand(() -> hoodStop(), this).withName("Stop"));
-  }
-
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Hood Encoder Distance", getHoodEncoderDistance());
-    SmartDashboard.putNumber("Hood Angle", getHoodAngle());
+    this.setDefaultCommand(new RunCommand(() -> stop(), this).withName("Stop"));
   }
 
   /**
-   * 
-   * @param speed positive speed 0-1 hood rotates upward
-   */
-  public void setHood(double speed) {
-    if (speed < 0) {speed = getLowSwitch()?0:speed;} // stops at bottom when REV mag limit switch active
-    if (speed > 0) {speed = (getHoodEncoderDistance() > 150)?0:speed;} // soft limit when encoder count high 
-    hoodMotor.set(ControlMode.PercentOutput,-speed);  // invert speed so negative input is down 
+  * Set speed of hood motor
+  * @param speed positive speed 0-1 hood rotates upward
+  */
+  public void set(double speed) {
+    // Set speed to zero when a low switch or encoder at soft limit of 150
+    speed = ((speed < 0 && getLowSwitch()) || (speed > 0 && getEncoderValue() > 150))?0:speed;
+    m_motor.set(-speed);  // invert speed so negative input is down 
   }
 
-  public void hoodStop() {
-    hoodMotor.set(ControlMode.PercentOutput, 0);
+  public void down(){
+    set(-0.5);
   }
 
-  public double getHoodEncoderDistance() {
-    return -hoodEncoder.getDistance();
+  public void up(){
+    set(0.7);
   }
 
-  public void resetEncoderDistance() {
-    hoodEncoder.reset();
+  /**
+  * Stop the subsystem motors
+  */
+  public void stop() {
+    m_motor.stopMotor();
+  }
+
+  public void reset() {
+    m_encoder.reset();
+  }
+
+  @Log(name="Hood Dist",tabName = "Debug")
+  public double getEncoderValue() {
+    return -m_encoder.getDistance();
   }
   
-  public double getHoodAngle() {
-    return ShooterConstants.kHoodStartingAngle
-           -(getHoodEncoderDistance()*ShooterConstants.kHoodDegreesPerCount);
+  @Log.Dial(name="Hood Angle",tabName = "Live")
+  public double getAngle() {
+    return HoodConstants.kHoodStartingAngle
+           -(getEncoderValue()*HoodConstants.kHoodDegreesPerCount);
   }
-  @Log
+
+  @Log(name="Hood Down",tabName = "Live")
   public boolean getLowSwitch(){
    return !m_lowSwitch.get();  // logic inverted
   }
