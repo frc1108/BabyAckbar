@@ -62,6 +62,11 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
     backMotor.set(-0.9); 
   }
 
+  public void reverse() {
+    frontMotor.set(0.6);
+    backMotor.set(0.7);
+  }
+
   public void drop() {
     m_dropMotor.set(ControlMode.PercentOutput,0.5);
   }

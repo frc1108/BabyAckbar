@@ -33,7 +33,7 @@ public class HoodSubsystem extends SubsystemBase implements Loggable {
   */
   public void set(double speed) {
     // Set speed to zero when a low switch or encoder at soft limit of 150
-    speed = ((speed < 0 && getLowSwitch()) || (speed > 0 && getEncoderValue() > 150))?0:speed;
+    // speed = ((speed < 0 && getLowSwitch()) || (speed > 0 && getEncoderValue() > 150))?0:speed;
     m_motor.set(-speed);  // invert speed so negative input is down 
   }
 

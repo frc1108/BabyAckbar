@@ -1,16 +1,20 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class Bounce extends SequentialCommandGroup {
-  public Bounce(DriveSubsystem m_robotDrive) {        
-      Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Bounce1");
-      Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Bounce2");
-      Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Bounce3");
-      Trajectory trajectory4 = m_robotDrive.loadTrajectoryFromFile("Bounce4");
+  public Bounce(DriveSubsystem m_robotDrive) {  
+    TrajectoryConfig fwdConfig = new TrajectoryConfig(2, 3);
+    TrajectoryConfig revConfig = new TrajectoryConfig(2, 3).setReversed(true);
+
+    Trajectory trajectory1 = m_robotDrive.generateTrajectory("Bounce1", fwdConfig);
+    Trajectory trajectory2 = m_robotDrive.generateTrajectory("Bounce2", revConfig);
+    Trajectory trajectory3 = m_robotDrive.generateTrajectory("Bounce3", fwdConfig);
+    Trajectory trajectory4 = m_robotDrive.generateTrajectory("Bounce4", revConfig);
       
       addCommands(
           new InstantCommand(() -> {

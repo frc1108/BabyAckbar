@@ -35,6 +35,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.photonvision.PhotonCamera;
+
 
 import frc.robot.pantherlib.Trajectory6391;
 
@@ -61,6 +63,9 @@ public class DriveSubsystem extends SubsystemBase {
   private final CANEncoder m_rightEncoder;
   private final DifferentialDriveOdometry m_odometry;
   private static final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+
+  private final PhotonCamera m_camera = new PhotonCamera("SnakeEyes");
+
 
   public DriveSubsystem() {
     // Stops drive motors
@@ -114,6 +119,16 @@ public class DriveSubsystem extends SubsystemBase {
 
     public Pose2d getPose() {
       return m_odometry.getPoseMeters();
+  }
+
+  public double getVisionAngle() {
+    var result = m_camera.getLatestResult();
+    if (result.hasTargets()) {
+      return (getHeading() - result.getBestTarget().getYaw());
+    } else {
+      // If we have no targets, stay still.
+      return getHeading();
+    }
   }
 
   

@@ -74,12 +74,12 @@ public final class Constants {
 
 
   public static final class HoodConstants {
-    public static final int kHoodMotorPort = 22;
+    public static final int kHoodMotorPort = 33; //22
 
-    public static final int kHoodEncoderPortA = 0;
-    public static final int kHoodEncoderPortB = 1;
+    public static final int kHoodEncoderPortA = 4;
+    public static final int kHoodEncoderPortB = 5;
     public static final double kHoodStartingAngle = 66.0; //measured via phone app
-    public static final double kHoodDegreesPerCount = ((93-24) / 169.5); //phone app measurement
+    public static final double kHoodDegreesPerCount = ((93-24) / 1520.0); //phone app measurement
     public static int kLowSwitchPort = 2;
 
 	public static double kHoodP = 0.01;

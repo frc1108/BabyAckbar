@@ -40,7 +40,8 @@ import frc.robot.commands.auto.GalacticSearch;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private double defaultSpeed = 0.8;
+  private double driveSpeed = 0.9;
+  private double turnSpeed = 0.8;
   private double triggerSpeed = 0.5; 
 
   // The robot's subsystems
@@ -72,7 +73,7 @@ public class RobotContainer {
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
     autoChooser.addOption("Galactic", new GalacticSearchParallelGroup(m_robotDrive,m_intake));
 
-    m_robotDrive.setMaxOutput(defaultSpeed);
+    m_robotDrive.setMaxOutput(driveSpeed);
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
@@ -83,7 +84,7 @@ public class RobotContainer {
             () ->
                 m_robotDrive.arcadeDrive(
                     m_driverController.getY(GenericHID.Hand.kLeft),
-                    m_driverController.getX(GenericHID.Hand.kRight)),
+                    turnSpeed*m_driverController.getX(GenericHID.Hand.kRight)),
             m_robotDrive));
 
             m_intake.setDefaultCommand(
@@ -92,7 +93,7 @@ public class RobotContainer {
             m_hood.setDefaultCommand(
                 new RunCommand(
                     ()->
-                    m_hood.set(-m_operatorController.getY(GenericHID.Hand.kLeft)),m_hood));
+                    m_hood.set(m_operatorController.getY(GenericHID.Hand.kLeft)),m_hood));
   }
 
   /**
@@ -106,10 +107,14 @@ public class RobotContainer {
     
     new JoystickButton(m_driverController, Button.kBumperRight.value)
         .whenPressed(() -> m_robotDrive.setMaxOutput(triggerSpeed))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(defaultSpeed));
+        .whenReleased(() -> m_robotDrive.setMaxOutput(driveSpeed));
 
     new JoystickButton(m_operatorController, Button.kBumperLeft.value)
         .whenPressed(() -> m_intake.start())
+        .whenReleased(() -> m_intake.stop());
+
+    new JoystickButton(m_operatorController, Button.kBumperRight.value)
+        .whenPressed(() -> m_intake.reverse())
         .whenReleased(() -> m_intake.stop());
 
 
@@ -121,8 +126,8 @@ public class RobotContainer {
         .whenPressed(() -> m_hotDog.start())
         .whenReleased(() -> m_hotDog.stop());
 
-    //new JoystickButton(m_driverController, Button.kX.value)
-    //    .whenPressed(new FieldOrientedTurn(180, m_robotDrive));
+    new JoystickButton(m_driverController, Button.kX.value)
+        .whenPressed(new FieldOrientedTurn(m_robotDrive.getVisionAngle(), m_robotDrive));
 
     new JoystickButton(m_operatorController, Button.kY.value)
         .whenPressed(() -> m_shooter.toggleServo());
