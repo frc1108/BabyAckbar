@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
+import edu.wpi.first.wpilibj.MedianFilter;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.drive.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -54,11 +56,15 @@ public class DriveSubsystem extends SubsystemBase {
   private final PIDController m_rightPID = new PIDController(DriveConstants.kPDriveVel, 0, 0);
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.ksVolts,DriveConstants.kvVoltSecondsPerMeter,DriveConstants.kaVoltSecondsSquaredPerMeter);
   
-  public double m_slewSpeed = 5;  // in units/s
-  public double m_slewTurn = 5;
+  public final double m_slewSpeed = 5;  // in units/s
+  public final double m_slewTurn = 5;
   private final SlewRateLimiter m_speedSlew = new SlewRateLimiter(m_slewSpeed);
   private final SlewRateLimiter m_turnSlew = new SlewRateLimiter(m_slewTurn);
-  
+
+  public final int m_medianFilterWindow = 5;
+  private final MedianFilter m_speedMedianFilter = new MedianFilter(m_medianFilterWindow);
+  private final MedianFilter m_turnMedianFilter = new MedianFilter(m_medianFilterWindow);
+
   private final CANEncoder m_leftEncoder;
   private final CANEncoder m_rightEncoder;
   private final DifferentialDriveOdometry m_odometry;
@@ -172,6 +178,36 @@ public void reset(){
    */
   public void arcadeDrive(double fwd, double rot) {
     m_drive.arcadeDrive(m_speedSlew.calculate(-fwd), 0.8*m_turnSlew.calculate(rot));
+  }
+
+  /**
+   * Drive robot with arcade controls and ramp on velocity
+   * @param fwd the joystick forward 
+   * @param rot the joystick rotation
+   */
+  public void arcadeDrivePIDFwithSlew(double fwd, double rot) {
+    // Median filter on joystick input values
+    fwd = m_speedMedianFilter.calculate(fwd);
+    rot = m_turnMedianFilter.calculate(rot);
+
+    // Might want to access default deadband or specify own in constants
+    fwd = m_drive.applyDeadband(fwd, 0.02); //invert the joystick direction
+    rot = m_drive.applyDeadband(rot, 0.02);
+
+    // Inverse Kinematics to get wheel speeds for arcade drive (fwd inverted)
+    var speeds = m_drive.arcadeDriveIK(-fwd, rot, true);
+
+    // Slew limit the wheel speeds & apply robot max velocity value
+    speeds.left = DriveConstants.kMaxSpeedMetersPerSecond*m_speedSlew.calculate(speeds.left);
+    speeds.right = DriveConstants.kMaxSpeedMetersPerSecond*m_turnSlew.calculate(speeds.right);
+
+    // PIDF for velocity control based on Encoder feedback
+    m_leftMotors.setVoltage(m_feedforward.calculate(speeds.left)
+        + m_leftPID.calculate(m_leftEncoder.getVelocity(), speeds.left));
+    m_rightMotors.setVoltage(m_feedforward.calculate(speeds.right)
+        + m_rightPID.calculate(-m_rightEncoder.getVelocity(), speeds.right));
+
+    m_drive.feed();
   }
 
   /** Resets the drive encoders to currently read a position of 0. */

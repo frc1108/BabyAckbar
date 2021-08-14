@@ -51,6 +51,8 @@ public final class Constants {
 
     public static final double kTurnToleranceDeg = 4; //0.5
     public static final double kTurnRateToleranceDegPerS = 8;
+
+    public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(8);
   }
 
   public static final class ShooterConstants {
